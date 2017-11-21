@@ -54,6 +54,29 @@ class MailChimpService
     }
 
     /**
+     * @return array
+     */
+    public function getCampaigns() {
+        return $this->get('campaigns');
+    }
+
+    /**
+     * @param $campaignId
+     * @return array
+     */
+    public function getCampaignInfo($campaignId) {
+        return $this->get('campaigns/'.$campaignId);
+    }
+
+    /**
+     * @param $campaignId
+     * @return array
+     */
+    public function getCampaignContent($campaignId) {
+        return $this->get('campaigns/'.$campaignId.'/content');
+    }
+
+    /**
      * @return CallbackQueryResult|QueryResultInterface
      */
     public function getLists()
