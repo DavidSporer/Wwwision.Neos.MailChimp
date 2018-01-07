@@ -1,4 +1,5 @@
 <?php
+
 namespace Wwwision\Neos\MailChimp\Domain\Service;
 
 use Neos\Flow\Annotations as Flow;
@@ -50,30 +51,38 @@ class MailChimpService
             throw new InvalidApiKeyException(sprintf('Invalid MailChimp API key %s supplied.', $apiKey), 1483531773);
         }
         list(, $dataCenter) = explode('-', $this->apiKey);
-        $this->apiEndpoint  = sprintf('https://%s.api.mailchimp.com/3.0', $dataCenter);
+        $this->apiEndpoint = sprintf('https://%s.api.mailchimp.com/3.0', $dataCenter);
     }
 
     /**
+     * @param string $status
      * @return array
      */
-    public function getCampaigns() {
-        return $this->get('campaigns');
+    public function getCampaigns(string $status)
+    {
+        if ($status !== '') {
+            return $this->get('campaigns?status=' . $status);
+        } else {
+            return $this->get('campaigns');
+        }
     }
 
     /**
      * @param $campaignId
      * @return array
      */
-    public function getCampaignInfo($campaignId) {
-        return $this->get('campaigns/'.$campaignId);
+    public function getCampaignInfo($campaignId)
+    {
+        return $this->get('campaigns/' . $campaignId);
     }
 
     /**
      * @param $campaignId
      * @return array
      */
-    public function getCampaignContent($campaignId) {
-        return $this->get('campaigns/'.$campaignId.'/content');
+    public function getCampaignContent($campaignId)
+    {
+        return $this->get('campaigns/' . $campaignId . '/content');
     }
 
     /**
@@ -104,7 +113,8 @@ class MailChimpService
     public function getMembersByListId($listId)
     {
         $memberQuery = new CallbackQuery(function (CallbackQuery $query) use ($listId) {
-            $members = $this->get("lists/$listId/members", ['offset' => $query->getOffset(), 'count' => $query->getLimit()]);
+            $members = $this->get("lists/$listId/members",
+                ['offset' => $query->getOffset(), 'count' => $query->getLimit()]);
             return $members['members'];
         }, function () use ($listId) {
             $members = $this->get("lists/$listId/members", ['count' => 0]);
@@ -166,7 +176,8 @@ class MailChimpService
     public function unsubscribe($listId, $emailAddress)
     {
         $subscriberHash = md5(strtolower($emailAddress));
-        $this->patch("lists/$listId/members/$subscriberHash", ['email_address' => $emailAddress, 'status' => 'unsubscribed']);
+        $this->patch("lists/$listId/members/$subscriberHash",
+            ['email_address' => $emailAddress, 'status' => 'unsubscribed']);
     }
 
     /**
